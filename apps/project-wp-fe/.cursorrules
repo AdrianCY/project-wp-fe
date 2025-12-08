@@ -1,0 +1,11 @@
+# shadcn instructions
+
+This project in tanstack start, drizzle, tailwind, shadcn, jotai
+
+the project is a saas that aims to allow company to send and receive whatsapp message, and utilize whatsapp business features like flow message, mass message for advertisement, handle user subscription/unsubscribe...
+
+Use the latest version of Shadcn to install new components, like this command to add a button component:
+
+```bash
+pnpm dlx shadcn@latest add button
+```
