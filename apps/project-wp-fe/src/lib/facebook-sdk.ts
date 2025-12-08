@@ -127,17 +127,11 @@ export async function launchWhatsAppSignup(
 
   window.FB.login(
     (response) => {
-      if (response.status === 'connected' && response.authResponse) {
-        const { code, accessToken } = response.authResponse
-        
-        if (code) {
-          onSuccess({ code, accessToken })
-        } else if (accessToken) {
-          // Fallback if code is not returned
-          onSuccess({ code: '', accessToken })
-        } else {
-          onError(new Error('No authorization code received'))
-        }
+      // For embedded signup, we may get code even with 'unknown' status
+      const { code, accessToken } = response.authResponse || {}
+      
+      if (code || accessToken) {
+        onSuccess({ code: code || '', accessToken })
       } else if (response.status === 'not_authorized') {
         onCancel?.()
       } else {

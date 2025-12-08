@@ -1,9 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization } from "better-auth/plugins";
+import { desc, eq } from "drizzle-orm";
 import { Resend } from "resend";
 
 import { db } from "@/db";
+import { member } from "@/db/schema";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -70,6 +72,27 @@ export const auth = betterAuth({
 			},
 		}),
 	],
+
+	databaseHooks: {
+		session: {
+			create: {
+				before: async (session) => {
+					// Find user's most recently joined organization
+					const membership = await db.query.member.findFirst({
+						where: eq(member.userId, session.userId),
+						orderBy: desc(member.createdAt),
+					});
+
+					return {
+						data: {
+							...session,
+							activeOrganizationId: membership?.organizationId ?? null,
+						},
+					};
+				},
+			},
+		},
+	},
 });
 
 export type Session = typeof auth.$Infer.Session;

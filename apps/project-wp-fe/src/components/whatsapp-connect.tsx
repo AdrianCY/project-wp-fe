@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useServerFn } from '@tanstack/react-start'
 import { MessageSquare, Loader2, CheckCircle2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,21 +11,22 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { launchWhatsAppSignup, type WhatsAppSignupResult } from '@/lib/facebook-sdk'
-import { useActiveOrganization } from '@/lib/auth-client'
+import { connectWhatsApp } from '@/server/whatsapp/connect'
 
 interface WhatsAppConnectProps {
+  organizationId: string
   onSuccess?: () => void
 }
 
 type ConnectionState = 'idle' | 'connecting' | 'processing' | 'success' | 'error'
 
-export function WhatsAppConnect({ onSuccess }: WhatsAppConnectProps) {
+export function WhatsAppConnect({ organizationId, onSuccess }: WhatsAppConnectProps) {
   const [state, setState] = useState<ConnectionState>('idle')
   const [error, setError] = useState<string | null>(null)
-  const { data: activeOrg } = useActiveOrganization()
+  const connectWhatsAppFn = useServerFn(connectWhatsApp)
 
   const handleConnect = async () => {
-    if (!activeOrg) {
+    if (!organizationId) {
       setError('Please create or join an organization first')
       return
     }
@@ -37,23 +39,12 @@ export function WhatsAppConnect({ onSuccess }: WhatsAppConnectProps) {
         setState('processing')
         
         try {
-          // Send the code to backend for processing
-          const response = await fetch('/api/whatsapp/callback', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+          await connectWhatsAppFn({
+            data: {
               code: result.code,
-              accessToken: result.accessToken,
-              organizationId: activeOrg.id,
-            }),
+              organizationId,
+            },
           })
-
-          if (!response.ok) {
-            const data = await response.json()
-            throw new Error(data.error || 'Failed to connect WhatsApp account')
-          }
 
           setState('success')
           onSuccess?.()
@@ -74,7 +65,7 @@ export function WhatsAppConnect({ onSuccess }: WhatsAppConnectProps) {
 
   if (state === 'success') {
     return (
-      <Empty className="border border-dashed bg-gradient-to-b from-green-50/50 to-background dark:from-green-950/20">
+      <Empty className="border border-dashed bg-linear-to-b from-green-50/50 to-background dark:from-green-950/20">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <CheckCircle2 className="text-green-600" />
@@ -95,7 +86,7 @@ export function WhatsAppConnect({ onSuccess }: WhatsAppConnectProps) {
   }
 
   return (
-    <Empty className="border border-dashed bg-gradient-to-b from-muted/30 to-background">
+    <Empty className="border border-dashed bg-linear-to-b from-muted/30 to-background">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <MessageSquare />
@@ -116,7 +107,7 @@ export function WhatsAppConnect({ onSuccess }: WhatsAppConnectProps) {
 
         <Button
           onClick={handleConnect}
-          disabled={state === 'connecting' || state === 'processing' || !activeOrg}
+          disabled={state === 'connecting' || state === 'processing'}
           size="lg"
         >
           {state === 'connecting' || state === 'processing' ? (
@@ -131,12 +122,6 @@ export function WhatsAppConnect({ onSuccess }: WhatsAppConnectProps) {
             </>
           )}
         </Button>
-
-        {!activeOrg && (
-          <p className="text-sm text-muted-foreground">
-            You need to create or join an organization first.
-          </p>
-        )}
 
         <Button
           variant="link"

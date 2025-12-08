@@ -9,6 +9,7 @@ import { nitro } from 'nitro/vite'
 const config = defineConfig({
   server: {
     port: 5173,
+    allowedHosts: ['summary-dodo-set.ngrok-free.app'],
   },
   plugins: [
     devtools(),

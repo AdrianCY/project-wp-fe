@@ -1,4 +1,4 @@
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import {
   LayoutDashboard,
   MessageSquare,
@@ -24,7 +24,8 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from '@/components/ui/sidebar'
-import { signOut, useSession, useActiveOrganization } from '@/lib/auth-client'
+import { signOut } from '@/lib/auth-client'
+import type { ActiveOrganization } from '@/server/auth'
 
 const mainNavItems = [
   {
@@ -67,10 +68,11 @@ const settingsNavItems = [
   },
 ]
 
-export function AppSidebar() {
-  const router = useRouter()
-  const { data: session } = useSession()
-  const { data: activeOrg } = useActiveOrganization()
+interface AppSidebarProps {
+  activeOrganization: ActiveOrganization
+}
+
+export function AppSidebar({ activeOrganization }: AppSidebarProps) {
 
   const handleSignOut = async () => {
     await signOut()
@@ -86,9 +88,9 @@ export function AppSidebar() {
           </div>
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-sm font-semibold">WhatsApp SaaS</span>
-            {activeOrg && (
+            {activeOrganization && (
               <span className="truncate text-xs text-muted-foreground">
-                {activeOrg.name}
+                {activeOrganization.name}
               </span>
             )}
           </div>
@@ -137,11 +139,11 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
-          {activeOrg && (
+          {activeOrganization && (
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Organization">
                 <Building2 className="size-4" />
-                <span className="truncate">{activeOrg.name}</span>
+                <span className="truncate">{activeOrganization.name}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}

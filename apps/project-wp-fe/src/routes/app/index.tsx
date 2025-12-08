@@ -1,10 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { MessageSquare, Users, Megaphone, Workflow, Loader2 } from 'lucide-react'
-import { OrganizationOnboarding, useHasOrganization } from '@/components/organization-onboarding'
+import { MessageSquare, Users, Megaphone, Workflow } from 'lucide-react'
+import { OrganizationOnboarding } from '@/components/organization-onboarding'
 import { WhatsAppConnect } from '@/components/whatsapp-connect'
-import { useActiveOrganization } from '@/lib/auth-client'
-import { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/app/')({
   component: DashboardPage,
@@ -37,55 +35,13 @@ const stats = [
   },
 ]
 
-function useHasConnectedWABA() {
-  const { data: activeOrg } = useActiveOrganization()
-  const [hasWABA, setHasWABA] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (!activeOrg) {
-      setIsLoading(false)
-      setHasWABA(false)
-      return
-    }
-
-    const checkWABA = async () => {
-      try {
-        const response = await fetch(`/api/whatsapp/status?orgId=${activeOrg.id}`)
-        if (response.ok) {
-          const data = await response.json()
-          setHasWABA(data.hasConnectedWABA)
-        }
-      } catch {
-        // Silently fail - assume no WABA
-        setHasWABA(false)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    checkWABA()
-  }, [activeOrg])
-
-  return { hasWABA, isLoading }
-}
-
 function DashboardPage() {
-  const { hasOrganization, isLoading: isOrgLoading } = useHasOrganization()
-  const { hasWABA, isLoading: isWABALoading } = useHasConnectedWABA()
-  const [refreshKey, setRefreshKey] = useState(0)
+  const router = useRouter()
+  const { hasOrganization, hasConnectedWABA, activeOrganization } = Route.useRouteContext()
 
   const handleOnboardingComplete = () => {
-    setRefreshKey((k) => k + 1)
-  }
-
-  // Show loading state
-  if (isOrgLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-muted-foreground" />
-      </div>
-    )
+    // Invalidate the route to refetch the status
+    router.invalidate()
   }
 
   // Show organization onboarding if user doesn't have an organization
@@ -98,13 +54,13 @@ function DashboardPage() {
             Welcome to your WhatsApp Business dashboard
           </p>
         </div>
-        <OrganizationOnboarding key={refreshKey} onComplete={handleOnboardingComplete} />
+        <OrganizationOnboarding onComplete={handleOnboardingComplete} />
       </div>
     )
   }
 
   // Show WhatsApp connection prompt if no WABA connected
-  if (!isWABALoading && !hasWABA) {
+  if (!hasConnectedWABA && activeOrganization) {
     return (
       <div className="space-y-6">
         <div>
@@ -113,7 +69,7 @@ function DashboardPage() {
             Welcome to your WhatsApp Business dashboard
           </p>
         </div>
-        <WhatsAppConnect key={refreshKey} onSuccess={handleOnboardingComplete} />
+        <WhatsAppConnect organizationId={activeOrganization.id} onSuccess={handleOnboardingComplete} />
       </div>
     )
   }

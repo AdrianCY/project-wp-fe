@@ -16,7 +16,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as ApiWhatsappWebhookRouteImport } from './routes/api/whatsapp/webhook'
 import { Route as ApiWhatsappStatusRouteImport } from './routes/api/whatsapp/status'
-import { Route as ApiWhatsappCallbackRouteImport } from './routes/api/whatsapp/callback'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const SignUpRoute = SignUpRouteImport.update({
@@ -54,11 +53,6 @@ const ApiWhatsappStatusRoute = ApiWhatsappStatusRouteImport.update({
   path: '/api/whatsapp/status',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWhatsappCallbackRoute = ApiWhatsappCallbackRouteImport.update({
-  id: '/api/whatsapp/callback',
-  path: '/api/whatsapp/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -72,7 +66,6 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/whatsapp/callback': typeof ApiWhatsappCallbackRoute
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
 }
@@ -82,7 +75,6 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/app': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/whatsapp/callback': typeof ApiWhatsappCallbackRoute
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
 }
@@ -94,7 +86,6 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/whatsapp/callback': typeof ApiWhatsappCallbackRoute
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
 }
@@ -107,7 +98,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/app/'
     | '/api/auth/$'
-    | '/api/whatsapp/callback'
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -117,7 +107,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/app'
     | '/api/auth/$'
-    | '/api/whatsapp/callback'
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
   id:
@@ -128,7 +117,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/app/'
     | '/api/auth/$'
-    | '/api/whatsapp/callback'
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
   fileRoutesById: FileRoutesById
@@ -139,7 +127,6 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiWhatsappCallbackRoute: typeof ApiWhatsappCallbackRoute
   ApiWhatsappStatusRoute: typeof ApiWhatsappStatusRoute
   ApiWhatsappWebhookRoute: typeof ApiWhatsappWebhookRoute
 }
@@ -195,13 +182,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWhatsappStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/whatsapp/callback': {
-      id: '/api/whatsapp/callback'
-      path: '/api/whatsapp/callback'
-      fullPath: '/api/whatsapp/callback'
-      preLoaderRoute: typeof ApiWhatsappCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -228,7 +208,6 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiWhatsappCallbackRoute: ApiWhatsappCallbackRoute,
   ApiWhatsappStatusRoute: ApiWhatsappStatusRoute,
   ApiWhatsappWebhookRoute: ApiWhatsappWebhookRoute,
 }

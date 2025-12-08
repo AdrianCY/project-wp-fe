@@ -141,12 +141,3 @@ export function OrganizationOnboarding({ onComplete }: OrganizationOnboardingPro
   )
 }
 
-export function useHasOrganization() {
-  const { data: organizations, isLoading } = useListOrganizations()
-  
-  return {
-    hasOrganization: (organizations?.length ?? 0) > 0,
-    isLoading,
-  }
-}
-

@@ -1,30 +1,35 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
-import { getSession } from '@/server/auth'
+import { getUserStatus } from '@/server/auth'
 
 export const Route = createFileRoute('/app')({
   beforeLoad: async () => {
-    // Server-side auth check using server function
-    const session = await getSession()
+    // Server-side auth and status check using server function
+    const status = await getUserStatus()
 
-    if (!session) {
+    if (!status.session) {
       throw redirect({
         to: '/sign-in',
       })
     }
 
     return {
-      session,
+      session: status.session,
+      hasOrganization: status.hasOrganization,
+      hasConnectedWABA: status.hasConnectedWABA,
+      activeOrganization: status.activeOrganization,
     }
   },
   component: AppLayout,
 })
 
 function AppLayout() {
+  const { activeOrganization } = Route.useRouteContext()
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar activeOrganization={activeOrganization} />
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b px-4">
           <SidebarTrigger />

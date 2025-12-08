@@ -114,7 +114,6 @@ export const whatsappBusinessAccounts = pgTable(
 		wabaId: varchar("waba_id", { length: 255 }).notNull().unique(),
 		name: varchar("name", { length: 255 }).notNull(),
 		status: wabaStatusEnum("status").default("pending").notNull(),
-		accessToken: text("access_token"),
 		metadata: jsonb("metadata"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
