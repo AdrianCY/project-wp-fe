@@ -78,12 +78,17 @@ async function exchangeForLongLivedToken(
 	const appId = process.env.FACEBOOK_APP_ID || process.env.VITE_FACEBOOK_APP_ID;
 	const appSecret = process.env.FACEBOOK_APP_SECRET;
 
+	if (!appId || !appSecret) {
+		console.warn("Missing Facebook credentials for long-lived token exchange");
+		return shortLivedToken;
+	}
+
 	const response = await fetch(
 		`${GRAPH_API_BASE}/oauth/access_token?` +
 			new URLSearchParams({
 				grant_type: "fb_exchange_token",
-				client_id: appId!,
-				client_secret: appSecret!,
+				client_id: appId,
+				client_secret: appSecret,
 				fb_exchange_token: shortLivedToken,
 			}),
 	);

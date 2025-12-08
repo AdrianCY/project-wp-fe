@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,8 @@ export function CreateOrganizationDialog({
 }: CreateOrganizationDialogProps) {
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const nameId = useId();
+	const slugId = useId();
 
 	const {
 		register,
@@ -52,8 +54,6 @@ export function CreateOrganizationDialog({
 		resolver: valibotResolver(createOrganizationSchema),
 		defaultValues: { name: "", slug: "" },
 	});
-
-	const nameValue = watch("name");
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const name = e.target.value;
@@ -111,9 +111,9 @@ export function CreateOrganizationDialog({
 						)}
 
 						<div className="space-y-2">
-							<Label htmlFor="org-name">Organization Name</Label>
+							<Label htmlFor={nameId}>Organization Name</Label>
 							<Input
-								id="org-name"
+								id={nameId}
 								placeholder="Acme Inc."
 								disabled={isLoading}
 								{...register("name")}
@@ -127,9 +127,9 @@ export function CreateOrganizationDialog({
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="org-slug">Slug</Label>
+							<Label htmlFor={slugId}>Slug</Label>
 							<Input
-								id="org-slug"
+								id={slugId}
 								placeholder="acme-inc"
 								disabled={isLoading}
 								{...register("slug")}

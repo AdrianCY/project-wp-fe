@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/complexity/noBannedTypes: we use this to ignore the type errors */
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
@@ -95,13 +96,14 @@ export const getContacts = createServerFn({ method: "GET" })
 		];
 
 		if (search) {
-			conditions.push(
-				or(
-					ilike(contacts.name, `%${search}%`),
-					ilike(contacts.phoneNumber, `%${search}%`),
-					ilike(contacts.email, `%${search}%`),
-				)!,
+			const searchCondition = or(
+				ilike(contacts.name, `%${search}%`),
+				ilike(contacts.phoneNumber, `%${search}%`),
+				ilike(contacts.email, `%${search}%`),
 			);
+			if (searchCondition) {
+				conditions.push(searchCondition);
+			}
 		}
 
 		// Get total count

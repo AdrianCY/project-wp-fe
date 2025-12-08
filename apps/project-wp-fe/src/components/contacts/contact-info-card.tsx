@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import {
 	Card,
@@ -23,6 +24,10 @@ export function ContactInfoCard({
 	isEditing,
 	isPending,
 }: ContactInfoCardProps) {
+	const phoneNumberId = useId();
+	const nameId = useId();
+	const emailId = useId();
+
 	return (
 		<Card>
 			<CardHeader>
@@ -32,11 +37,11 @@ export function ContactInfoCard({
 			<CardContent>
 				<form className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="phoneNumber">
+						<Label htmlFor={phoneNumberId}>
 							Phone Number <span className="text-destructive">*</span>
 						</Label>
 						<Input
-							id="phoneNumber"
+							id={phoneNumberId}
 							disabled={!isEditing || isPending}
 							{...register("phoneNumber")}
 						/>
@@ -48,9 +53,9 @@ export function ContactInfoCard({
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="name">Name</Label>
+						<Label htmlFor={nameId}>Name</Label>
 						<Input
-							id="name"
+							id={nameId}
 							disabled={!isEditing || isPending}
 							{...register("name")}
 						/>
@@ -60,9 +65,9 @@ export function ContactInfoCard({
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
+						<Label htmlFor={emailId}>Email</Label>
 						<Input
-							id="email"
+							id={emailId}
 							type="email"
 							disabled={!isEditing || isPending}
 							{...register("email")}

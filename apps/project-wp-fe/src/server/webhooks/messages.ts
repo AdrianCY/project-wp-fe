@@ -82,7 +82,7 @@ export async function handleIncomingMessages(
 		});
 
 		const messageTimestamp = new Date(
-			Number.parseInt(message.timestamp) * 1000,
+			Number.parseInt(message.timestamp, 10) * 1000,
 		);
 		const windowExpiry = new Date(
 			messageTimestamp.getTime() + 24 * 60 * 60 * 1000,
@@ -138,7 +138,7 @@ export async function handleIncomingMessages(
  */
 export async function handleStatusUpdates(statuses: WebhookStatus[]) {
 	for (const status of statuses) {
-		const timestamp = new Date(Number.parseInt(status.timestamp) * 1000);
+		const timestamp = new Date(Number.parseInt(status.timestamp, 10) * 1000);
 		const updateData: Record<string, unknown> = {
 			status: status.status,
 			updatedAt: new Date(),

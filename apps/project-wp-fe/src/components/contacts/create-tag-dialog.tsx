@@ -1,5 +1,5 @@
 import { Tag } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,8 @@ export function CreateTagDialog({
 }: CreateTagDialogProps) {
 	const [name, setName] = useState("");
 	const [color, setColor] = useState("#6b7280");
+	const tagNameId = useId();
+	const tagColorId = useId();
 
 	const handleCreate = () => {
 		if (name.trim()) {
@@ -54,20 +56,20 @@ export function CreateTagDialog({
 				</DialogHeader>
 				<div className="space-y-4 py-4">
 					<div className="space-y-2">
-						<Label htmlFor="tagName">Tag Name</Label>
+						<Label htmlFor={tagNameId}>Tag Name</Label>
 						<Input
-							id="tagName"
+							id={tagNameId}
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder="e.g., VIP, Newsletter, Leads"
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="tagColor">Color</Label>
+						<Label htmlFor={tagColorId}>Color</Label>
 						<div className="flex items-center gap-2">
 							<input
 								type="color"
-								id="tagColor"
+								id={tagColorId}
 								value={color}
 								onChange={(e) => setColor(e.target.value)}
 								className="h-10 w-20 cursor-pointer rounded border"

@@ -60,7 +60,7 @@ export async function handleAccountReviewUpdate(
  * Handle phone_number_name_update events (Display name approval/rejection)
  */
 export async function handlePhoneNumberNameUpdate(
-	wabaId: string,
+	_wabaId: string,
 	value: PhoneNumberNameUpdateValue,
 ) {
 	const { display_phone_number, decision, requested_verified_name } = value;
@@ -79,7 +79,7 @@ export async function handlePhoneNumberNameUpdate(
  * Handle phone_number_quality_update events (Quality rating changes)
  */
 export async function handlePhoneNumberQualityUpdate(
-	wabaId: string,
+	_wabaId: string,
 	value: PhoneNumberQualityUpdateValue,
 ) {
 	const { display_phone_number, event, current_limit } = value;

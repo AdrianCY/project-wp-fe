@@ -1,6 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,9 @@ export function CreateContactDialog({
 }: CreateContactDialogProps) {
 	const [error, setError] = useState<string | null>(null);
 	const [isPending, setIsPending] = useState(false);
+	const phoneNumberId = useId();
+	const nameId = useId();
+	const emailId = useId();
 
 	const createContactFn = useServerFn(createContact);
 
@@ -104,11 +107,11 @@ export function CreateContactDialog({
 						)}
 
 						<div className="space-y-2">
-							<Label htmlFor="phoneNumber">
+							<Label htmlFor={phoneNumberId}>
 								Phone Number <span className="text-destructive">*</span>
 							</Label>
 							<Input
-								id="phoneNumber"
+								id={phoneNumberId}
 								placeholder="+1234567890"
 								disabled={isPending}
 								{...register("phoneNumber")}
@@ -124,9 +127,9 @@ export function CreateContactDialog({
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="name">Name</Label>
+							<Label htmlFor={nameId}>Name</Label>
 							<Input
-								id="name"
+								id={nameId}
 								placeholder="John Doe"
 								disabled={isPending}
 								{...register("name")}
@@ -139,9 +142,9 @@ export function CreateContactDialog({
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
+							<Label htmlFor={emailId}>Email</Label>
 							<Input
-								id="email"
+								id={emailId}
 								type="email"
 								placeholder="john@example.com"
 								disabled={isPending}
