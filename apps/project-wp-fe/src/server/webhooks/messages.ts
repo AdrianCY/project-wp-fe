@@ -7,7 +7,7 @@ import {
   conversations,
   messages,
 } from "@/db/schema";
-import type { MessageChangeValue, WebhookStatus } from "./types";
+import type { MessageChangeValue, WebhookStatus, WebhookMessage } from "./types";
 
 /**
  * Process incoming WhatsApp messages
@@ -168,7 +168,7 @@ export async function handleStatusUpdates(statuses: WebhookStatus[]) {
  * Build message content object based on message type
  */
 function buildMessageContent(
-  message: MessageChangeValue["messages"][number]
+  message: WebhookMessage
 ): Record<string, unknown> {
   switch (message.type) {
     case "text":
