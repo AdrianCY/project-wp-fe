@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useMatchRoute } from '@tanstack/react-router'
 import {
   LayoutDashboard,
   MessageSquare,
@@ -73,6 +73,19 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ activeOrganization }: AppSidebarProps) {
+  const matchRoute = useMatchRoute()
+
+  const isPathActive = (href: string) => {
+    // TanStack Router matcher keeps params/search handling consistent with routing.
+    const isDashboard = href === '/app'
+    return Boolean(
+      matchRoute({
+        to: href,
+        // Dashboard should only match exactly; others can match child paths.
+        fuzzy: !isDashboard,
+      })
+    )
+  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -104,7 +117,11 @@ export function AppSidebar({ activeOrganization }: AppSidebarProps) {
             <SidebarMenu>
               {mainNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                    isActive={isPathActive(item.href)}
+                  >
                     <Link to={item.href}>
                       <item.icon className="size-4" />
                       <span>{item.title}</span>
@@ -124,7 +141,11 @@ export function AppSidebar({ activeOrganization }: AppSidebarProps) {
             <SidebarMenu>
               {settingsNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                    isActive={isPathActive(item.href)}
+                  >
                     <Link to={item.href}>
                       <item.icon className="size-4" />
                       <span>{item.title}</span>
