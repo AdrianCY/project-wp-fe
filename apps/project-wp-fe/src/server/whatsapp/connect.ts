@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@/db";
-import { whatsappBusinessAccounts, phoneNumbers } from "@/db/schema";
+import { phoneNumbers, whatsappBusinessAccounts } from "@/db/schema";
 import { authMiddleware } from "@/server/middleware/auth";
 
 const GRAPH_API_VERSION = "v21.0";
@@ -56,12 +56,14 @@ async function exchangeCodeForToken(code: string): Promise<string> {
 				client_id: appId,
 				client_secret: appSecret,
 				code,
-			})
+			}),
 	);
 
 	if (!response.ok) {
 		const error = await response.json();
-		throw new Error(error.error?.message || "Failed to exchange code for token");
+		throw new Error(
+			error.error?.message || "Failed to exchange code for token",
+		);
 	}
 
 	const data = await response.json();
@@ -70,7 +72,9 @@ async function exchangeCodeForToken(code: string): Promise<string> {
 	return exchangeForLongLivedToken(shortLivedToken);
 }
 
-async function exchangeForLongLivedToken(shortLivedToken: string): Promise<string> {
+async function exchangeForLongLivedToken(
+	shortLivedToken: string,
+): Promise<string> {
 	const appId = process.env.FACEBOOK_APP_ID || process.env.VITE_FACEBOOK_APP_ID;
 	const appSecret = process.env.FACEBOOK_APP_SECRET;
 
@@ -81,7 +85,7 @@ async function exchangeForLongLivedToken(shortLivedToken: string): Promise<strin
 				client_id: appId!,
 				client_secret: appSecret!,
 				fb_exchange_token: shortLivedToken,
-			})
+			}),
 	);
 
 	if (!response.ok) {
@@ -102,7 +106,7 @@ async function getSharedWABAIds(accessToken: string): Promise<string[]> {
 			new URLSearchParams({
 				input_token: accessToken,
 				access_token: `${appId}|${appSecret}`,
-			})
+			}),
 	);
 
 	if (!response.ok) {
@@ -112,18 +116,21 @@ async function getSharedWABAIds(accessToken: string): Promise<string[]> {
 	const data: DebugTokenResponse = await response.json();
 
 	const wabaScope = data.data.granular_scopes?.find(
-		(scope) => scope.scope === "whatsapp_business_management"
+		(scope) => scope.scope === "whatsapp_business_management",
 	);
 
 	return wabaScope?.target_ids || [];
 }
 
-async function getWABADetails(wabaId: string, accessToken: string): Promise<WABAResponse> {
+async function getWABADetails(
+	wabaId: string,
+	accessToken: string,
+): Promise<WABAResponse> {
 	const response = await fetch(
 		`${GRAPH_API_BASE}/${wabaId}?` +
 			new URLSearchParams({
 				access_token: accessToken,
-			})
+			}),
 	);
 
 	if (!response.ok) {
@@ -133,12 +140,15 @@ async function getWABADetails(wabaId: string, accessToken: string): Promise<WABA
 	return response.json();
 }
 
-async function getPhoneNumbers(wabaId: string, accessToken: string): Promise<PhoneNumberResponse> {
+async function getPhoneNumbers(
+	wabaId: string,
+	accessToken: string,
+): Promise<PhoneNumberResponse> {
 	const response = await fetch(
 		`${GRAPH_API_BASE}/${wabaId}/phone_numbers?` +
 			new URLSearchParams({
 				access_token: accessToken,
-			})
+			}),
 	);
 
 	if (!response.ok) {
@@ -148,7 +158,10 @@ async function getPhoneNumbers(wabaId: string, accessToken: string): Promise<Pho
 	return response.json();
 }
 
-async function subscribeWABAToWebhook(wabaId: string, accessToken: string): Promise<void> {
+async function subscribeWABAToWebhook(
+	wabaId: string,
+	accessToken: string,
+): Promise<void> {
 	const response = await fetch(`${GRAPH_API_BASE}/${wabaId}/subscribed_apps`, {
 		method: "POST",
 		headers: {
@@ -284,4 +297,3 @@ export const connectWhatsApp = createServerFn({ method: "POST" })
 			},
 		};
 	});
-

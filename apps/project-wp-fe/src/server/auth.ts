@@ -1,13 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import {
-	member,
-	organization,
-	whatsappBusinessAccounts,
-} from "@/db/schema";
+import { member, organization, whatsappBusinessAccounts } from "@/db/schema";
+import { auth } from "@/lib/auth";
 
 /**
  * Server function to get the current session.
@@ -21,7 +17,7 @@ export const getSession = createServerFn({ method: "GET" }).handler(
 		});
 
 		return session;
-	}
+	},
 );
 
 export type ActiveOrganization = {
@@ -89,7 +85,7 @@ export const getUserStatus = createServerFn({ method: "GET" }).handler(
 			const wabas = await db.query.whatsappBusinessAccounts.findMany({
 				where: eq(
 					whatsappBusinessAccounts.organizationId,
-					session.session.activeOrganizationId
+					session.session.activeOrganizationId,
 				),
 			});
 			hasConnectedWABA = wabas.some((w) => w.status === "connected");
@@ -101,6 +97,5 @@ export const getUserStatus = createServerFn({ method: "GET" }).handler(
 			hasConnectedWABA,
 			activeOrganization,
 		};
-	}
+	},
 );
-

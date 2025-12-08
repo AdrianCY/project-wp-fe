@@ -44,7 +44,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 		setError(null);
 		setIsLoading(true);
 
-    console.log("handleEmailSubmit", data);
+		console.log("handleEmailSubmit", data);
 
 		try {
 			const result = await emailOtp.sendVerificationOtp({

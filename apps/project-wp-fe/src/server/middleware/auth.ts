@@ -31,4 +31,3 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 export type AuthContext = {
 	session: Session;
 };
-

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, ilike, or, sql, desc, asc, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { contacts, contactTags, contactsToTags } from "@/db/schema";
+import { contacts, contactsToTags, contactTags } from "@/db/schema";
 import { authMiddleware } from "@/server/middleware/auth";
 
 // ============================================================================
@@ -99,8 +99,8 @@ export const getContacts = createServerFn({ method: "GET" })
 				or(
 					ilike(contacts.name, `%${search}%`),
 					ilike(contacts.phoneNumber, `%${search}%`),
-					ilike(contacts.email, `%${search}%`)
-				)!
+					ilike(contacts.email, `%${search}%`),
+				)!,
 			);
 		}
 
@@ -135,14 +135,14 @@ export const getContacts = createServerFn({ method: "GET" })
 				...contact,
 				metadata: contact.metadata as Record<string, {}> | null,
 				tags: await getTagsForContact(contact.id),
-			}))
+			})),
 		);
 
 		// Filter by tags if specified (after fetching)
 		let filteredContacts = contactsWithTags;
 		if (tagIds && tagIds.length > 0) {
 			filteredContacts = contactsWithTags.filter((contact) =>
-				contact.tags.some((tag) => tagIds.includes(tag.id))
+				contact.tags.some((tag) => tagIds.includes(tag.id)),
 			);
 		}
 
@@ -171,7 +171,7 @@ export const getContactById = createServerFn({ method: "GET" })
 			where: and(
 				eq(contacts.id, id),
 				eq(contacts.organizationId, organizationId),
-				isNull(contacts.deletedAt)
+				isNull(contacts.deletedAt),
 			),
 		});
 
@@ -222,7 +222,7 @@ export const createContact = createServerFn({ method: "POST" })
 				tagIds.map((tagId: string) => ({
 					contactId: newContact.id,
 					tagId,
-				}))
+				})),
 			);
 		}
 
@@ -258,7 +258,7 @@ export const updateContact = createServerFn({ method: "POST" })
 			where: and(
 				eq(contacts.id, id),
 				eq(contacts.organizationId, organizationId),
-				isNull(contacts.deletedAt)
+				isNull(contacts.deletedAt),
 			),
 		});
 
@@ -281,9 +281,7 @@ export const updateContact = createServerFn({ method: "POST" })
 		// Update tags if provided
 		if (tagIds !== undefined) {
 			// Remove existing tags
-			await db
-				.delete(contactsToTags)
-				.where(eq(contactsToTags.contactId, id));
+			await db.delete(contactsToTags).where(eq(contactsToTags.contactId, id));
 
 			// Add new tags
 			if (tagIds.length > 0) {
@@ -291,7 +289,7 @@ export const updateContact = createServerFn({ method: "POST" })
 					tagIds.map((tagId: string) => ({
 						contactId: id,
 						tagId,
-					}))
+					})),
 				);
 			}
 		}
@@ -325,7 +323,7 @@ export const deleteContact = createServerFn({ method: "POST" })
 			where: and(
 				eq(contacts.id, id),
 				eq(contacts.organizationId, organizationId),
-				isNull(contacts.deletedAt)
+				isNull(contacts.deletedAt),
 			),
 		});
 
@@ -416,7 +414,7 @@ export const deleteTag = createServerFn({ method: "POST" })
 		const existing = await db.query.contactTags.findFirst({
 			where: and(
 				eq(contactTags.id, id),
-				eq(contactTags.organizationId, organizationId)
+				eq(contactTags.organizationId, organizationId),
 			),
 		});
 
