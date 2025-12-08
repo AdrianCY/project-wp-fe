@@ -14,6 +14,8 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppContactsIndexRouteImport } from './routes/app/contacts/index'
+import { Route as AppContactsContactIdRouteImport } from './routes/app/contacts/$contactId'
 import { Route as ApiWhatsappWebhookRouteImport } from './routes/api/whatsapp/webhook'
 import { Route as ApiWhatsappStatusRouteImport } from './routes/api/whatsapp/status'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -43,6 +45,16 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppContactsIndexRoute = AppContactsIndexRouteImport.update({
+  id: '/contacts/',
+  path: '/contacts/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContactsContactIdRoute = AppContactsContactIdRouteImport.update({
+  id: '/contacts/$contactId',
+  path: '/contacts/$contactId',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiWhatsappWebhookRoute = ApiWhatsappWebhookRouteImport.update({
   id: '/api/whatsapp/webhook',
   path: '/api/whatsapp/webhook',
@@ -68,6 +80,8 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
+  '/app/contacts/$contactId': typeof AppContactsContactIdRoute
+  '/app/contacts': typeof AppContactsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,6 +91,8 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
+  '/app/contacts/$contactId': typeof AppContactsContactIdRoute
+  '/app/contacts': typeof AppContactsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,6 +104,8 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
+  '/app/contacts/$contactId': typeof AppContactsContactIdRoute
+  '/app/contacts/': typeof AppContactsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,6 +118,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
+    | '/app/contacts/$contactId'
+    | '/app/contacts'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,6 +129,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
+    | '/app/contacts/$contactId'
+    | '/app/contacts'
   id:
     | '__root__'
     | '/'
@@ -119,6 +141,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
+    | '/app/contacts/$contactId'
+    | '/app/contacts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -168,6 +192,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/contacts/': {
+      id: '/app/contacts/'
+      path: '/contacts'
+      fullPath: '/app/contacts'
+      preLoaderRoute: typeof AppContactsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/contacts/$contactId': {
+      id: '/app/contacts/$contactId'
+      path: '/contacts/$contactId'
+      fullPath: '/app/contacts/$contactId'
+      preLoaderRoute: typeof AppContactsContactIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/whatsapp/webhook': {
       id: '/api/whatsapp/webhook'
       path: '/api/whatsapp/webhook'
@@ -194,10 +232,14 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppContactsContactIdRoute: typeof AppContactsContactIdRoute
+  AppContactsIndexRoute: typeof AppContactsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppContactsContactIdRoute: AppContactsContactIdRoute,
+  AppContactsIndexRoute: AppContactsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
