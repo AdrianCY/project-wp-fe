@@ -14,6 +14,7 @@ export const getRouter = () => {
 		context: { ...rqContext },
 		defaultPreload: false,
 		defaultPendingMs: 0,
+		defaultPendingMinMs: 100,
 		Wrap: (props: { children: React.ReactNode }) => {
 			return (
 				<TanstackQuery.Provider {...rqContext}>

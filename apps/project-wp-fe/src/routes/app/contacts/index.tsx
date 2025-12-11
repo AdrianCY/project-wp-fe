@@ -2,12 +2,12 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Plus, Search, Users } from "lucide-react";
 import { useState } from "react";
+import { ContactsListSkeleton } from "@/components/contacts/contact-list-skeleton";
 import { ContactsTable } from "@/components/contacts/contacts-table";
 import { CreateContactDialog } from "@/components/contacts/create-contact-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { deleteContact, getContacts } from "@/server/contacts";
 
 export const Route = createFileRoute("/app/contacts/")({
@@ -22,7 +22,6 @@ export const Route = createFileRoute("/app/contacts/")({
 		return result;
 	},
 	pendingComponent: ContactsListSkeleton,
-	pendingMinMs: 200,
 	component: ContactsPage,
 });
 
@@ -158,54 +157,6 @@ function ContactsPage() {
 				onOpenChange={setIsCreateOpen}
 				onSuccess={handleCreateSuccess}
 			/>
-		</div>
-	);
-}
-
-function ContactsListSkeleton() {
-	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="space-y-2">
-					<Skeleton className="h-9 w-32" />
-					<Skeleton className="h-5 w-64" />
-				</div>
-				<Skeleton className="h-10 w-32" />
-			</div>
-
-			{/* Card with table */}
-			<Card>
-				<CardHeader>
-					<Skeleton className="h-10 w-full" />
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
-						{/* Table header */}
-						<div className="flex items-center gap-4 border-b pb-3">
-							<Skeleton className="size-4" />
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-4 w-28" />
-							<Skeleton className="h-4 w-32" />
-							<Skeleton className="h-4 w-16" />
-							<Skeleton className="h-4 w-20" />
-						</div>
-						{/* Table rows */}
-						{Array.from({ length: 5 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton list that never reorders
-							<div key={i} className="flex items-center gap-4 py-2">
-								<Skeleton className="size-4" />
-								<Skeleton className="h-4 w-32" />
-								<Skeleton className="h-4 w-28" />
-								<Skeleton className="h-4 w-40" />
-								<Skeleton className="h-6 w-16 rounded-full" />
-								<Skeleton className="h-4 w-24" />
-								<Skeleton className="size-8 ml-auto" />
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
 		</div>
 	);
 }
