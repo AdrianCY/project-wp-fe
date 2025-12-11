@@ -6,12 +6,12 @@ A WhatsApp Business API platform for managing customer communications, marketing
 
 ---
 
-## Current Sprint: Contacts Management
+## Current Sprint: Outbound Marketing
 
 ### Completed
-- [x] Contacts list page with DataTable
-- [x] Create/edit contact functionality
-- [x] Contact tagging system
+- [x] Templates list page with sync functionality
+- [x] Template creation form with preview
+- [x] Template sync from Meta API
 
 ---
 
@@ -36,12 +36,15 @@ A WhatsApp Business API platform for managing customer communications, marketing
 
 ### Phase 2: Outbound Marketing
 
-#### 📋 Planned
-- [ ] **Templates** - WhatsApp message templates
+#### ✅ Completed
+- [x] **Templates** - WhatsApp message templates
   - List approved/pending templates
+  - Sync templates from Meta
   - Create new templates (submit to Meta)
   - Template preview
   - Variable management
+
+#### 📋 Planned
 
 - [ ] **Campaigns** - Bulk messaging
   - Campaign creation wizard
@@ -112,6 +115,17 @@ A WhatsApp Business API platform for managing customer communications, marketing
 
 ## Changelog
 
+### 2024-12-11
+- ✅ Completed Templates page implementation
+  - Server functions for templates CRUD operations (`src/server/templates.ts`)
+  - Templates list with search and pagination
+  - Sync templates from Meta API (Graph API integration)
+  - Create template form with real-time preview
+  - Support for headers, body, footer, and buttons
+  - Template submission to Meta for approval
+- Added UI components: textarea
+- Templates page at `/app/templates` with create page at `/app/templates/create`
+
 ### 2024-12-08
 - ✅ Completed Contacts page implementation
   - Server functions for CRUD operations (`src/server/contacts.ts`)
@@ -121,4 +135,3 @@ A WhatsApp Business API platform for managing customer communications, marketing
   - Tag management system (create, assign, remove tags)
 - Added UI components: table, dropdown-menu, badge, select, checkbox
 - Created project roadmap documentation
-

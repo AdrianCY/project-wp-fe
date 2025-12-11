@@ -1,10 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@/db";
 import { phoneNumbers, whatsappBusinessAccounts } from "@/db/schema";
+import {
+	GRAPH_API_BASE,
+	getFacebookAppCredentials,
+	getSystemAccessToken,
+} from "@/lib/facebook-api";
 import { authMiddleware } from "@/server/middleware/auth";
-
-const GRAPH_API_VERSION = "v21.0";
-const GRAPH_API_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
 
 // Response types
 interface DebugTokenResponse {
@@ -43,12 +45,7 @@ interface PhoneNumberResponse {
 
 // Helper functions
 async function exchangeCodeForToken(code: string): Promise<string> {
-	const appId = process.env.FACEBOOK_APP_ID || process.env.VITE_FACEBOOK_APP_ID;
-	const appSecret = process.env.FACEBOOK_APP_SECRET;
-
-	if (!appId || !appSecret) {
-		throw new Error("Facebook app credentials not configured");
-	}
+	const { appId, appSecret } = getFacebookAppCredentials();
 
 	const response = await fetch(
 		`${GRAPH_API_BASE}/oauth/access_token?` +
@@ -75,36 +72,36 @@ async function exchangeCodeForToken(code: string): Promise<string> {
 async function exchangeForLongLivedToken(
 	shortLivedToken: string,
 ): Promise<string> {
-	const appId = process.env.FACEBOOK_APP_ID || process.env.VITE_FACEBOOK_APP_ID;
-	const appSecret = process.env.FACEBOOK_APP_SECRET;
+	try {
+		const { appId, appSecret } = getFacebookAppCredentials();
 
-	if (!appId || !appSecret) {
-		console.warn("Missing Facebook credentials for long-lived token exchange");
+		const response = await fetch(
+			`${GRAPH_API_BASE}/oauth/access_token?` +
+				new URLSearchParams({
+					grant_type: "fb_exchange_token",
+					client_id: appId,
+					client_secret: appSecret,
+					fb_exchange_token: shortLivedToken,
+				}),
+		);
+
+		if (!response.ok) {
+			console.warn(
+				"Failed to exchange for long-lived token, using short-lived",
+			);
+			return shortLivedToken;
+		}
+
+		const data = await response.json();
+		return data.access_token;
+	} catch (error) {
+		console.warn("Failed to exchange for long-lived token:", error);
 		return shortLivedToken;
 	}
-
-	const response = await fetch(
-		`${GRAPH_API_BASE}/oauth/access_token?` +
-			new URLSearchParams({
-				grant_type: "fb_exchange_token",
-				client_id: appId,
-				client_secret: appSecret,
-				fb_exchange_token: shortLivedToken,
-			}),
-	);
-
-	if (!response.ok) {
-		console.warn("Failed to exchange for long-lived token, using short-lived");
-		return shortLivedToken;
-	}
-
-	const data = await response.json();
-	return data.access_token;
 }
 
 async function getSharedWABAIds(accessToken: string): Promise<string[]> {
-	const appId = process.env.FACEBOOK_APP_ID || process.env.VITE_FACEBOOK_APP_ID;
-	const appSecret = process.env.FACEBOOK_APP_SECRET;
+	const { appId, appSecret } = getFacebookAppCredentials();
 
 	const response = await fetch(
 		`${GRAPH_API_BASE}/debug_token?` +
@@ -215,7 +212,13 @@ export const connectWhatsApp = createServerFn({ method: "POST" })
 		const savedWABAs = [];
 
 		// Use system token for API calls (preferred), fallback to user token
-		const apiToken = process.env.FACEBOOK_SYSTEM_USER_TOKEN || userToken;
+		let apiToken: string;
+		try {
+			apiToken = getSystemAccessToken();
+		} catch {
+			// Fallback to user token if system token is not configured
+			apiToken = userToken;
+		}
 
 		// Process each WABA
 		for (const wabaId of wabaIds) {

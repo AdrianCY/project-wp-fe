@@ -14,7 +14,9 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppTemplatesIndexRouteImport } from './routes/app/templates/index'
 import { Route as AppContactsIndexRouteImport } from './routes/app/contacts/index'
+import { Route as AppTemplatesCreateRouteImport } from './routes/app/templates/create'
 import { Route as AppContactsContactIdRouteImport } from './routes/app/contacts/$contactId'
 import { Route as ApiWhatsappWebhookRouteImport } from './routes/api/whatsapp/webhook'
 import { Route as ApiWhatsappStatusRouteImport } from './routes/api/whatsapp/status'
@@ -45,9 +47,19 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTemplatesIndexRoute = AppTemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppContactsIndexRoute = AppContactsIndexRouteImport.update({
   id: '/contacts/',
   path: '/contacts/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTemplatesCreateRoute = AppTemplatesCreateRouteImport.update({
+  id: '/templates/create',
+  path: '/templates/create',
   getParentRoute: () => AppRoute,
 } as any)
 const AppContactsContactIdRoute = AppContactsContactIdRouteImport.update({
@@ -81,7 +93,9 @@ export interface FileRoutesByFullPath {
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/app/contacts/$contactId': typeof AppContactsContactIdRoute
+  '/app/templates/create': typeof AppTemplatesCreateRoute
   '/app/contacts': typeof AppContactsIndexRoute
+  '/app/templates': typeof AppTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,7 +106,9 @@ export interface FileRoutesByTo {
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/app/contacts/$contactId': typeof AppContactsContactIdRoute
+  '/app/templates/create': typeof AppTemplatesCreateRoute
   '/app/contacts': typeof AppContactsIndexRoute
+  '/app/templates': typeof AppTemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,7 +121,9 @@ export interface FileRoutesById {
   '/api/whatsapp/status': typeof ApiWhatsappStatusRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/app/contacts/$contactId': typeof AppContactsContactIdRoute
+  '/app/templates/create': typeof AppTemplatesCreateRoute
   '/app/contacts/': typeof AppContactsIndexRoute
+  '/app/templates/': typeof AppTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,7 +137,9 @@ export interface FileRouteTypes {
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
     | '/app/contacts/$contactId'
+    | '/app/templates/create'
     | '/app/contacts'
+    | '/app/templates'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -130,7 +150,9 @@ export interface FileRouteTypes {
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
     | '/app/contacts/$contactId'
+    | '/app/templates/create'
     | '/app/contacts'
+    | '/app/templates'
   id:
     | '__root__'
     | '/'
@@ -142,7 +164,9 @@ export interface FileRouteTypes {
     | '/api/whatsapp/status'
     | '/api/whatsapp/webhook'
     | '/app/contacts/$contactId'
+    | '/app/templates/create'
     | '/app/contacts/'
+    | '/app/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -192,11 +216,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/templates/': {
+      id: '/app/templates/'
+      path: '/templates'
+      fullPath: '/app/templates'
+      preLoaderRoute: typeof AppTemplatesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/contacts/': {
       id: '/app/contacts/'
       path: '/contacts'
       fullPath: '/app/contacts'
       preLoaderRoute: typeof AppContactsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/templates/create': {
+      id: '/app/templates/create'
+      path: '/templates/create'
+      fullPath: '/app/templates/create'
+      preLoaderRoute: typeof AppTemplatesCreateRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/contacts/$contactId': {
@@ -233,13 +271,17 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppContactsContactIdRoute: typeof AppContactsContactIdRoute
+  AppTemplatesCreateRoute: typeof AppTemplatesCreateRoute
   AppContactsIndexRoute: typeof AppContactsIndexRoute
+  AppTemplatesIndexRoute: typeof AppTemplatesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppContactsContactIdRoute: AppContactsContactIdRoute,
+  AppTemplatesCreateRoute: AppTemplatesCreateRoute,
   AppContactsIndexRoute: AppContactsIndexRoute,
+  AppTemplatesIndexRoute: AppTemplatesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
