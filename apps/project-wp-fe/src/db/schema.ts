@@ -8,6 +8,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 	uuid,
 	varchar,
 } from "drizzle-orm/pg-core";
@@ -320,12 +321,18 @@ export const messageTemplates = pgTable(
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		deletedAt: timestamp("deleted_at"),
 	},
-	(table) => [
-		index("template_org_idx").on(table.organizationId),
-		index("template_waba_idx").on(table.wabaId),
-		index("template_status_idx").on(table.status),
-		index("template_name_idx").on(table.name),
-	],
+	(table) => {
+		return {
+			templateOrgIdx: index("template_org_idx").on(table.organizationId),
+			templateWabaIdx: index("template_waba_idx").on(table.wabaId),
+			templateStatusIdx: index("template_status_idx").on(table.status),
+			templateNameIdx: index("template_name_idx").on(table.name),
+			templateIdWabaIdUnique: uniqueIndex("template_id_waba_id_unique").on(
+				table.templateId,
+				table.wabaId,
+			),
+		};
+	},
 );
 
 // ============================================================================

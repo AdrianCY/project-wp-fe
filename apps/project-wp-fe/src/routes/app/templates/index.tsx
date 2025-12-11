@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, Plus, RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { TemplatesListSkeleton } from "@/components/templates/templates-list-skeleton";
 import { TemplatesTable } from "@/components/templates/templates-table";
 import { Button } from "@/components/ui/button";
@@ -61,10 +62,10 @@ function TemplatesPage() {
 		setIsSyncing(true);
 		try {
 			const result = await syncTemplatesFn();
-			alert(result.message);
+			toast.success(result.message);
 			router.invalidate();
 		} catch (error) {
-			alert(
+			toast.error(
 				error instanceof Error ? error.message : "Failed to sync templates",
 			);
 		} finally {

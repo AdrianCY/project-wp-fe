@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { TemplateCreateSkeleton } from "@/components/templates/template-create-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,9 +50,24 @@ function CreateTemplatePage() {
 	const [headerText, setHeaderText] = useState("");
 	const [bodyText, setBodyText] = useState("");
 	const [footerText, setFooterText] = useState("");
+	const [headerExample, setHeaderExample] = useState("");
+	const [bodyExamples, setBodyExamples] = useState<string[]>([]);
 	const [buttons, setButtons] = useState<ButtonComponent[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isPending, setIsPending] = useState(false);
+
+	// Extract variable count from text
+	const getVariableCount = (text: string): number => {
+		const matches = text.match(/\{\{(\d+)\}\}/g);
+		if (!matches) return 0;
+		const numbers = matches.map((m) =>
+			Number.parseInt(m.match(/\d+/)?.[0] || "0"),
+		);
+		return Math.max(...numbers, 0);
+	};
+
+	const headerVariableCount = getVariableCount(headerText);
+	const bodyVariableCount = getVariableCount(bodyText);
 
 	const handleAddButton = () => {
 		if (buttons.length < 3) {
@@ -101,23 +117,57 @@ function CreateTemplatePage() {
 
 		setIsPending(true);
 
+		// Validate examples for variables
+		if (headerVariableCount > 0 && !headerExample.trim()) {
+			setError("Please provide an example for the header variable");
+			return;
+		}
+
+		if (bodyVariableCount > 0) {
+			const filledExamples = bodyExamples.filter((ex) => ex.trim() !== "");
+			if (filledExamples.length < bodyVariableCount) {
+				setError(
+					`Please provide examples for all ${bodyVariableCount} body variables`,
+				);
+				return;
+			}
+		}
+
 		try {
 			const components: TemplateComponent[] = [];
 
 			// Add header if provided
 			if (headerText) {
-				components.push({
+				const headerComponent: TemplateComponent = {
 					type: "HEADER",
 					format: "TEXT",
 					text: headerText,
-				});
+				};
+
+				// Add example if header has variables
+				if (headerVariableCount > 0) {
+					headerComponent.example = {
+						header_text: [headerExample],
+					};
+				}
+
+				components.push(headerComponent);
 			}
 
 			// Add body (required)
-			components.push({
+			const bodyComponent: TemplateComponent = {
 				type: "BODY",
 				text: bodyText,
-			});
+			};
+
+			// Add examples if body has variables
+			if (bodyVariableCount > 0) {
+				bodyComponent.example = {
+					body_text: [bodyExamples.slice(0, bodyVariableCount)],
+				};
+			}
+
+			components.push(bodyComponent);
 
 			// Add footer if provided
 			if (footerText) {
@@ -149,13 +199,14 @@ function CreateTemplatePage() {
 			});
 
 			if (result.success) {
-				alert(result.message);
+				toast.success(result.message);
 				router.navigate({ to: "/app/templates" });
 			}
 		} catch (err) {
-			setError(
-				err instanceof Error ? err.message : "Failed to create template",
-			);
+			const errorMessage =
+				err instanceof Error ? err.message : "Failed to create template";
+			setError(errorMessage);
+			toast.error(errorMessage);
 		} finally {
 			setIsPending(false);
 		}
@@ -297,7 +348,28 @@ function CreateTemplatePage() {
 									placeholder="Welcome to our service!"
 									disabled={isPending}
 								/>
+								<p className="text-xs text-muted-foreground">
+									Use {`{{1}}`} for a variable in the header
+								</p>
 							</div>
+
+							{headerVariableCount > 0 && (
+								<div className="space-y-2">
+									<Label htmlFor="headerExample">
+										Header Example <span className="text-destructive">*</span>
+									</Label>
+									<Input
+										id="headerExample"
+										value={headerExample}
+										onChange={(e) => setHeaderExample(e.target.value)}
+										placeholder="John"
+										disabled={isPending}
+									/>
+									<p className="text-xs text-muted-foreground">
+										Provide an example value for the header variable
+									</p>
+								</div>
+							)}
 
 							<div className="space-y-2">
 								<Label htmlFor="body">
@@ -315,6 +387,30 @@ function CreateTemplatePage() {
 									Use {`{{1}}, {{2}}`}, etc. for variables
 								</p>
 							</div>
+
+							{bodyVariableCount > 0 && (
+								<div className="space-y-2">
+									<Label>
+										Body Examples <span className="text-destructive">*</span>
+									</Label>
+									{Array.from({ length: bodyVariableCount }, (_, i) => (
+										<Input
+											key={`body-example-var-${i + 1}`}
+											value={bodyExamples[i] || ""}
+											onChange={(e) => {
+												const newExamples = [...bodyExamples];
+												newExamples[i] = e.target.value;
+												setBodyExamples(newExamples);
+											}}
+											placeholder={`Example for {{${i + 1}}}`}
+											disabled={isPending}
+										/>
+									))}
+									<p className="text-xs text-muted-foreground">
+										Provide example values for each variable (required by Meta)
+									</p>
+								</div>
+							)}
 
 							<div className="space-y-2">
 								<Label htmlFor="footer">Footer (Optional)</Label>
@@ -437,11 +533,19 @@ function CreateTemplatePage() {
 					<CardContent>
 						<div className="rounded-lg border bg-muted/50 p-4 space-y-3">
 							{headerText && (
-								<div className="font-semibold text-lg">{headerText}</div>
+								<div className="font-semibold text-lg">
+									{headerText.replace(
+										/\{\{1\}\}/g,
+										headerExample || "[Example]",
+									)}
+								</div>
 							)}
 							{bodyText && (
 								<div className="whitespace-pre-wrap text-sm">
-									{bodyText.replace(/\{\{(\d+)\}\}/g, "[Variable $1]")}
+									{bodyText.replace(/\{\{(\d+)\}\}/g, (_match, num) => {
+										const index = Number.parseInt(num) - 1;
+										return bodyExamples[index] || `[Example ${num}]`;
+									})}
 								</div>
 							)}
 							{footerText && (
