@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { TemplateCreateSkeleton } from "@/components/templates/template-create-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/app/templates/create")({
 		const wabas = await getConnectedWABAs();
 		return { wabas };
 	},
+	pendingComponent: TemplateCreateSkeleton,
 	component: CreateTemplatePage,
 });
 

@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, Plus, RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
+import { TemplatesListSkeleton } from "@/components/templates/templates-list-skeleton";
 import { TemplatesTable } from "@/components/templates/templates-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/app/templates/")({
 		});
 		return result;
 	},
+	pendingComponent: TemplatesListSkeleton,
 	component: TemplatesPage,
 });
 
