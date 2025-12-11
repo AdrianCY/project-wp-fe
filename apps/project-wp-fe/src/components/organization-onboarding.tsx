@@ -53,7 +53,7 @@ export function OrganizationOnboarding({
 			try {
 				const result = await organization.listInvitations();
 				if (result.data) {
-					setInvitations(result.data as Invitation[]);
+					setInvitations(result.data as unknown as Invitation[]);
 				}
 			} catch {
 				// Silently fail - invitations are optional
@@ -86,7 +86,7 @@ export function OrganizationOnboarding({
 
 	return (
 		<>
-			<Empty className="border border-dashed bg-gradient-to-b from-muted/30 to-background">
+			<Empty className="border border-dashed bg-linear-to-b from-muted/30 to-background h-full">
 				<EmptyHeader>
 					<EmptyMedia variant="icon">
 						<Building2 />

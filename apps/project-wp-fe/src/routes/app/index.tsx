@@ -54,14 +54,16 @@ function DashboardPage() {
 	// Show organization onboarding if user doesn't have an organization
 	if (!hasOrganization) {
 		return (
-			<div className="space-y-6">
+			<div className="space-y-6 h-full flex flex-col">
 				<div>
 					<h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
 					<p className="text-muted-foreground">
 						Welcome to your WhatsApp Business dashboard
 					</p>
 				</div>
-				<OrganizationOnboarding onComplete={handleOnboardingComplete} />
+				<div className="flex-1">
+					<OrganizationOnboarding onComplete={handleOnboardingComplete} />
+				</div>
 			</div>
 		);
 	}
@@ -69,17 +71,19 @@ function DashboardPage() {
 	// Show WhatsApp connection prompt if no WABA connected
 	if (!hasConnectedWABA && activeOrganization) {
 		return (
-			<div className="space-y-6">
+			<div className="space-y-6 h-full flex flex-col">
 				<div>
 					<h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
 					<p className="text-muted-foreground">
 						Welcome to your WhatsApp Business dashboard
 					</p>
 				</div>
-				<WhatsAppConnect
-					organizationId={activeOrganization.id}
-					onSuccess={handleOnboardingComplete}
-				/>
+				<div className="flex-1">
+					<WhatsAppConnect
+						organizationId={activeOrganization.id}
+						onSuccess={handleOnboardingComplete}
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -150,6 +154,8 @@ function DashboardPage() {
 					</CardContent>
 				</Card>
 			</div>
+
+			{/* TODO: Add graph later */}
 		</div>
 	);
 }

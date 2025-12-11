@@ -85,7 +85,7 @@ export function WhatsAppConnect({
 
 	if (state === "success") {
 		return (
-			<Empty className="border border-dashed bg-linear-to-b from-green-50/50 to-background dark:from-green-950/20">
+			<Empty className="border border-dashed bg-linear-to-b from-green-50/50 to-background dark:from-green-950/20 h-full">
 				<EmptyHeader>
 					<EmptyMedia variant="icon">
 						<CheckCircle2 className="text-green-600" />
@@ -104,7 +104,7 @@ export function WhatsAppConnect({
 	}
 
 	return (
-		<Empty className="border border-dashed bg-linear-to-b from-muted/30 to-background">
+		<Empty className="border border-dashed bg-linear-to-b from-muted/30 to-background h-full">
 			<EmptyHeader>
 				<EmptyMedia variant="icon">
 					<MessageSquare />
