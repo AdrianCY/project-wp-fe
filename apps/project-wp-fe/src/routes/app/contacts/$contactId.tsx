@@ -1,4 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
@@ -15,20 +16,23 @@ import {
 	type CreateContactFormData,
 	createContactSchema,
 } from "@/lib/validations/contact";
-import type { ContactTag } from "@/server/contacts";
 import {
-	createTag,
-	deleteContact,
-	getContactById,
-	getTags,
-	updateContact,
-} from "@/server/contacts";
+	contactQueryKey,
+	contactQueryOptions,
+	contactsQueryKey,
+	tagsQueryKey,
+	tagsQueryOptions,
+} from "@/queries/contacts";
+import type { ContactTag } from "@/server/contacts";
+import { createTag, deleteContact, updateContact } from "@/server/contacts";
 
 export const Route = createFileRoute("/app/contacts/$contactId")({
-	loader: async ({ params }) => {
+	loader: async ({ params, context }) => {
 		const [contact, tags] = await Promise.all([
-			getContactById({ data: params.contactId }),
-			getTags(),
+			context.queryClient.ensureQueryData(
+				contactQueryOptions(params.contactId),
+			),
+			context.queryClient.ensureQueryData(tagsQueryOptions()),
 		]);
 		return { contact, tags };
 	},
@@ -40,7 +44,12 @@ export const Route = createFileRoute("/app/contacts/$contactId")({
 
 function ContactDetailPage() {
 	const { contactId } = Route.useParams();
-	const { contact, tags: allTags } = Route.useLoaderData();
+	const { queryClient } = Route.useRouteContext();
+	const { data: contactData } = useSuspenseQuery(
+		contactQueryOptions(contactId),
+	);
+	const { data: allTags } = useSuspenseQuery(tagsQueryOptions());
+	const contact = contactData;
 	const router = useRouter();
 	const [isEditing, setIsEditing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -78,6 +87,9 @@ function ContactDetailPage() {
 			setIsDeleting(true);
 			try {
 				await deleteContactFn({ data: contactId });
+				await queryClient.invalidateQueries({
+					queryKey: contactQueryKey(contactId),
+				});
 				router.navigate({ to: "/app/contacts" });
 			} finally {
 				setIsDeleting(false);
@@ -98,7 +110,10 @@ function ContactDetailPage() {
 					tagIds: contact?.tags.map((t) => t.id),
 				},
 			});
-			router.invalidate();
+			// Invalidate this contact detail query to show updated data
+			await queryClient.invalidateQueries({
+				queryKey: contactQueryKey(contactId),
+			});
 			setIsEditing(false);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to update contact");
@@ -122,7 +137,10 @@ function ContactDetailPage() {
 						tagIds: [...currentTagIds, tag.id],
 					},
 				});
-				router.invalidate();
+				// Invalidate this contact detail query to show updated data
+				await queryClient.invalidateQueries({
+					queryKey: contactQueryKey(contactId),
+				});
 			} finally {
 				setIsUpdating(false);
 			}
@@ -145,7 +163,10 @@ function ContactDetailPage() {
 					tagIds: newTagIds,
 				},
 			});
-			router.invalidate();
+			// Invalidate this contact detail query to show updated data
+			await queryClient.invalidateQueries({
+				queryKey: contactQueryKey(contactId),
+			});
 		} finally {
 			setIsUpdating(false);
 		}
@@ -155,7 +176,10 @@ function ContactDetailPage() {
 		setIsCreatingTag(true);
 		try {
 			await createTagFn({ data });
-			router.invalidate();
+			// Invalidate tags query to refetch with new tag
+			await queryClient.invalidateQueries({
+				queryKey: tagsQueryKey,
+			});
 			setIsCreateTagOpen(false);
 		} finally {
 			setIsCreatingTag(false);

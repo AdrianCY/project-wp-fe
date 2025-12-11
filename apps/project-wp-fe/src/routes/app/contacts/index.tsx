@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Plus, Search, Users } from "lucide-react";
@@ -8,18 +9,18 @@ import { CreateContactDialog } from "@/components/contacts/create-contact-dialog
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { deleteContact, getContacts } from "@/server/contacts";
+import { contactsQueryKey, contactsQueryOptions } from "@/queries/contacts";
+import { deleteContact } from "@/server/contacts";
 
 export const Route = createFileRoute("/app/contacts/")({
 	loaderDeps: ({ search }) => ({
 		search: (search as { q?: string }).q || "",
 		page: (search as { page?: number }).page || 1,
 	}),
-	loader: async ({ deps }) => {
-		const result = await getContacts({
-			data: { search: deps.search, page: deps.page, pageSize: 20 },
-		});
-		return result;
+	loader: ({ deps, context }) => {
+		return context.queryClient.ensureQueryData(
+			contactsQueryOptions(deps.search, deps.page),
+		);
 	},
 	pendingComponent: ContactsListSkeleton,
 	component: ContactsPage,
@@ -27,8 +28,9 @@ export const Route = createFileRoute("/app/contacts/")({
 
 function ContactsPage() {
 	const router = useRouter();
-	const data = Route.useLoaderData();
+	const { queryClient } = Route.useRouteContext();
 	const { search, page } = Route.useLoaderDeps();
+	const { data } = useSuspenseQuery(contactsQueryOptions(search, page));
 	const [searchInput, setSearchInput] = useState(search);
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -55,16 +57,25 @@ function ContactsPage() {
 			setIsDeleting(true);
 			try {
 				await deleteContactFn({ data: id });
-				router.invalidate();
+				// Invalidate contacts list and the specific contact detail query
+				await queryClient.invalidateQueries({
+					queryKey: contactsQueryKey,
+				});
+				await queryClient.invalidateQueries({
+					queryKey: ["contact", id],
+				});
 			} finally {
 				setIsDeleting(false);
 			}
 		}
 	};
 
-	const handleCreateSuccess = () => {
+	const handleCreateSuccess = async () => {
 		setIsCreateOpen(false);
-		router.invalidate();
+		// Invalidate contacts list to refetch with new contact
+		await queryClient.invalidateQueries({
+			queryKey: contactsQueryKey,
+		});
 	};
 
 	return (
