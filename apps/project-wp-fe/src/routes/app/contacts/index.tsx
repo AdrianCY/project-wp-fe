@@ -6,6 +6,16 @@ import { useState } from "react";
 import { ContactsListSkeleton } from "@/components/contacts/contact-list-skeleton";
 import { ContactsTable } from "@/components/contacts/contacts-table";
 import { CreateContactDialog } from "@/components/contacts/create-contact-dialog";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,6 +44,7 @@ function ContactsPage() {
 	const [searchInput, setSearchInput] = useState(search);
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [deleteId, setDeleteId] = useState<string | null>(null);
 
 	const deleteContactFn = useServerFn(deleteContact);
 
@@ -52,21 +63,22 @@ function ContactsPage() {
 		});
 	};
 
-	const handleDelete = async (id: string) => {
-		if (confirm("Are you sure you want to delete this contact?")) {
-			setIsDeleting(true);
-			try {
-				await deleteContactFn({ data: id });
-				// Invalidate contacts list and the specific contact detail query
-				await queryClient.invalidateQueries({
-					queryKey: contactsQueryKey,
-				});
-				await queryClient.invalidateQueries({
-					queryKey: ["contact", id],
-				});
-			} finally {
-				setIsDeleting(false);
-			}
+	const handleDelete = (id: string) => {
+		setDeleteId(id);
+	};
+
+	const confirmDelete = async () => {
+		if (!deleteId) return;
+		setIsDeleting(true);
+		try {
+			await deleteContactFn({ data: deleteId });
+			// Invalidate contacts list
+			await queryClient.invalidateQueries({
+				queryKey: contactsQueryKey,
+			});
+			setDeleteId(null);
+		} finally {
+			setIsDeleting(false);
 		}
 	};
 
@@ -168,6 +180,34 @@ function ContactsPage() {
 				onOpenChange={setIsCreateOpen}
 				onSuccess={handleCreateSuccess}
 			/>
+
+			<AlertDialog
+				open={!!deleteId}
+				onOpenChange={(open) => !open && setDeleteId(null)}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
+						<AlertDialogDescription>
+							This action cannot be undone. This will permanently delete the
+							contact.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={(e) => {
+								e.preventDefault();
+								confirmDelete();
+							}}
+							disabled={isDeleting}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							{isDeleting ? "Deleting..." : "Delete"}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }
