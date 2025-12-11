@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, Plus, RefreshCw, Search } from "lucide-react";
@@ -8,18 +9,18 @@ import { TemplatesTable } from "@/components/templates/templates-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getTemplates, syncTemplates } from "@/server/templates";
+import { templatesQueryKey, templatesQueryOptions } from "@/queries/templates";
+import { syncTemplates } from "@/server/templates";
 
 export const Route = createFileRoute("/app/templates/")({
 	loaderDeps: ({ search }) => ({
 		search: (search as { q?: string }).q || "",
 		page: (search as { page?: number }).page || 1,
 	}),
-	loader: async ({ deps }) => {
-		const result = await getTemplates({
-			data: { search: deps.search, page: deps.page, pageSize: 20 },
-		});
-		return result;
+	loader: ({ deps, context }) => {
+		return context.queryClient.ensureQueryData(
+			templatesQueryOptions(deps.search, deps.page),
+		);
 	},
 	pendingComponent: TemplatesListSkeleton,
 	component: TemplatesPage,
@@ -27,8 +28,9 @@ export const Route = createFileRoute("/app/templates/")({
 
 function TemplatesPage() {
 	const router = useRouter();
-	const data = Route.useLoaderData();
-	const { search } = Route.useLoaderDeps();
+	const { queryClient } = Route.useRouteContext();
+	const { search, page } = Route.useLoaderDeps();
+	const { data } = useSuspenseQuery(templatesQueryOptions(search, page));
 	const [searchInput, setSearchInput] = useState(search);
 	const [isSyncing, setIsSyncing] = useState(false);
 
@@ -63,7 +65,10 @@ function TemplatesPage() {
 		try {
 			const result = await syncTemplatesFn();
 			toast.success(result.message);
-			router.invalidate();
+			// Invalidate all templates queries using the query key from query options
+			await queryClient.invalidateQueries({
+				queryKey: templatesQueryKey,
+			});
 		} catch (error) {
 			toast.error(
 				error instanceof Error ? error.message : "Failed to sync templates",
