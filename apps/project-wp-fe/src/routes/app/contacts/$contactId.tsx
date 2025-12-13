@@ -19,7 +19,6 @@ import {
 import {
 	contactQueryKey,
 	contactQueryOptions,
-	contactsQueryKey,
 	tagsQueryKey,
 	tagsQueryOptions,
 } from "@/queries/contacts";

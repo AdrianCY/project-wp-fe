@@ -61,7 +61,7 @@ function CreateTemplatePage() {
 		const matches = text.match(/\{\{(\d+)\}\}/g);
 		if (!matches) return 0;
 		const numbers = matches.map((m) =>
-			Number.parseInt(m.match(/\d+/)?.[0] || "0"),
+			Number.parseInt(m.match(/\d+/)?.[0] || "0", 10),
 		);
 		return Math.max(...numbers, 0);
 	};
@@ -543,7 +543,7 @@ function CreateTemplatePage() {
 							{bodyText && (
 								<div className="whitespace-pre-wrap text-sm">
 									{bodyText.replace(/\{\{(\d+)\}\}/g, (_match, num) => {
-										const index = Number.parseInt(num) - 1;
+										const index = Number.parseInt(num, 10) - 1;
 										return bodyExamples[index] || `[Example ${num}]`;
 									})}
 								</div>
