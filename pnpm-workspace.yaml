@@ -1,7 +1,8 @@
 packages:
-  - packages/wp-db
-  - apps/project-wp-fe
-  - apps/websocket
+  - packages/**
+  - apps/**
 
 onlyBuiltDependencies:
   - esbuild
+
+linkWorkspacePackages: true
