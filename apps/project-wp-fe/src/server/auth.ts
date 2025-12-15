@@ -1,8 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
+import {
+	member,
+	organization,
+	session as sessionTable,
+	whatsappBusinessAccounts,
+} from "wp-db";
 import { db } from "@/db";
-import { member, organization, whatsappBusinessAccounts } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 /**
@@ -32,6 +37,7 @@ export type UserStatus = {
 	hasOrganization: boolean;
 	hasConnectedWABA: boolean;
 	activeOrganization: ActiveOrganization;
+	wsSecretKey: string | null;
 };
 
 /**
@@ -52,8 +58,15 @@ export const getUserStatus = createServerFn({ method: "GET" }).handler(
 				hasOrganization: false,
 				hasConnectedWABA: false,
 				activeOrganization: null,
+				wsSecretKey: null,
 			};
 		}
+
+		// Get the wsSecretKey from the session table
+		const sessionRecord = await db.query.session.findFirst({
+			where: eq(sessionTable.id, session.session.id),
+		});
+		const wsSecretKey = sessionRecord?.wsSecretKey ?? null;
 
 		// Check if user has any organizations
 		const memberships = await db.query.member.findMany({
@@ -96,6 +109,7 @@ export const getUserStatus = createServerFn({ method: "GET" }).handler(
 			hasOrganization,
 			hasConnectedWABA,
 			activeOrganization,
+			wsSecretKey,
 		};
 	},
 );

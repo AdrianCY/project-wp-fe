@@ -1,11 +1,11 @@
+import crypto from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization } from "better-auth/plugins";
 import { desc, eq } from "drizzle-orm";
 import { Resend } from "resend";
-
+import { member } from "wp-db";
 import { db } from "@/db";
-import { member } from "@/db/schema";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -83,10 +83,14 @@ export const auth = betterAuth({
 						orderBy: desc(member.createdAt),
 					});
 
+					// Generate a unique WebSocket secret key for this session
+					const wsSecretKey = crypto.randomUUID();
+
 					return {
 						data: {
 							...session,
 							activeOrganizationId: membership?.organizationId ?? null,
+							wsSecretKey,
 						},
 					};
 				},

@@ -1,8 +1,8 @@
 /** biome-ignore-all lint/complexity/noBannedTypes: we use this to ignore the type errors */
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { contacts, contactsToTags, contactTags } from "wp-db";
 import { db } from "@/db";
-import { contacts, contactsToTags, contactTags } from "@/db/schema";
 import { authMiddleware } from "@/server/middleware/auth";
 
 // ============================================================================

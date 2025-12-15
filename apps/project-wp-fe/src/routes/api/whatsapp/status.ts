@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { eq } from "drizzle-orm";
+import { whatsappBusinessAccounts } from "wp-db";
 import { db } from "@/db";
-import { whatsappBusinessAccounts } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 export const Route = createFileRoute("/api/whatsapp/status")({

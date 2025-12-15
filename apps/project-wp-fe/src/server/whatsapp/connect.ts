@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { phoneNumbers, whatsappBusinessAccounts } from "wp-db";
 import { db } from "@/db";
-import { phoneNumbers, whatsappBusinessAccounts } from "@/db/schema";
 import {
 	GRAPH_API_BASE,
 	getFacebookAppCredentials,

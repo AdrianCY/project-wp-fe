@@ -15,6 +15,13 @@
       "when": 1765172487224,
       "tag": "0001_giant_spyke",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765695422833,
+      "tag": "0002_amused_the_anarchist",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,6 @@
 /** biome-ignore-all lint/complexity/noBannedTypes: we use this to ignore the type errors */
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { db } from "@/db";
 import {
 	campaignRecipients,
 	campaigns,
@@ -13,7 +12,8 @@ import {
 	messageTemplates,
 	phoneNumbers,
 	whatsappBusinessAccounts,
-} from "@/db/schema";
+} from "wp-db";
+import { db } from "@/db";
 import { GRAPH_API_BASE, getSystemAccessToken } from "@/lib/facebook-api";
 import { authMiddleware } from "@/server/middleware/auth";
 

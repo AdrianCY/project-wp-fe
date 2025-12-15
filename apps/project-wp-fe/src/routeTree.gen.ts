@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppTemplatesIndexRouteImport } from './routes/app/templates/index'
+import { Route as AppConversationsIndexRouteImport } from './routes/app/conversations/index'
 import { Route as AppContactsIndexRouteImport } from './routes/app/contacts/index'
 import { Route as AppCampaignsIndexRouteImport } from './routes/app/campaigns/index'
 import { Route as AppTemplatesCreateRouteImport } from './routes/app/templates/create'
@@ -53,6 +54,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppTemplatesIndexRoute = AppTemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConversationsIndexRoute = AppConversationsIndexRouteImport.update({
+  id: '/conversations/',
+  path: '/conversations/',
   getParentRoute: () => AppRoute,
 } as any)
 const AppContactsIndexRoute = AppContactsIndexRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/app/templates/create': typeof AppTemplatesCreateRoute
   '/app/campaigns': typeof AppCampaignsIndexRoute
   '/app/contacts': typeof AppContactsIndexRoute
+  '/app/conversations': typeof AppConversationsIndexRoute
   '/app/templates': typeof AppTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/app/templates/create': typeof AppTemplatesCreateRoute
   '/app/campaigns': typeof AppCampaignsIndexRoute
   '/app/contacts': typeof AppContactsIndexRoute
+  '/app/conversations': typeof AppConversationsIndexRoute
   '/app/templates': typeof AppTemplatesIndexRoute
 }
 export interface FileRoutesById {
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/app/templates/create': typeof AppTemplatesCreateRoute
   '/app/campaigns/': typeof AppCampaignsIndexRoute
   '/app/contacts/': typeof AppContactsIndexRoute
+  '/app/conversations/': typeof AppConversationsIndexRoute
   '/app/templates/': typeof AppTemplatesIndexRoute
 }
 export interface FileRouteTypes {
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/app/templates/create'
     | '/app/campaigns'
     | '/app/contacts'
+    | '/app/conversations'
     | '/app/templates'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/app/templates/create'
     | '/app/campaigns'
     | '/app/contacts'
+    | '/app/conversations'
     | '/app/templates'
   id:
     | '__root__'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/app/templates/create'
     | '/app/campaigns/'
     | '/app/contacts/'
+    | '/app/conversations/'
     | '/app/templates/'
   fileRoutesById: FileRoutesById
 }
@@ -257,6 +269,13 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/app/templates'
       preLoaderRoute: typeof AppTemplatesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/conversations/': {
+      id: '/app/conversations/'
+      path: '/conversations'
+      fullPath: '/app/conversations'
+      preLoaderRoute: typeof AppConversationsIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/contacts/': {
@@ -333,6 +352,7 @@ interface AppRouteChildren {
   AppTemplatesCreateRoute: typeof AppTemplatesCreateRoute
   AppCampaignsIndexRoute: typeof AppCampaignsIndexRoute
   AppContactsIndexRoute: typeof AppContactsIndexRoute
+  AppConversationsIndexRoute: typeof AppConversationsIndexRoute
   AppTemplatesIndexRoute: typeof AppTemplatesIndexRoute
 }
 
@@ -344,6 +364,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTemplatesCreateRoute: AppTemplatesCreateRoute,
   AppCampaignsIndexRoute: AppCampaignsIndexRoute,
   AppContactsIndexRoute: AppContactsIndexRoute,
+  AppConversationsIndexRoute: AppConversationsIndexRoute,
   AppTemplatesIndexRoute: AppTemplatesIndexRoute,
 }
 

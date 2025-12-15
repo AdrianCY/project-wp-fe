@@ -1,12 +1,12 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "@/db";
 import {
 	contacts,
 	conversations,
 	messages,
 	phoneNumbers,
 	whatsappBusinessAccounts,
-} from "@/db/schema";
+} from "wp-db";
+import { db } from "@/db";
 import type {
 	MessageChangeValue,
 	WebhookMessage,

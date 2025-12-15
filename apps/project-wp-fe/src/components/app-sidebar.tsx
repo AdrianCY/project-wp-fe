@@ -88,6 +88,7 @@ export function AppSidebar({ activeOrganization }: AppSidebarProps) {
 	};
 
 	const handleSignOut = async () => {
+		console.log("signing out");
 		await signOut();
 		window.location.href = "/sign-in";
 	};
@@ -172,7 +173,7 @@ export function AppSidebar({ activeOrganization }: AppSidebarProps) {
 					)}
 					<SidebarMenuItem>
 						<SidebarMenuButton
-							onClick={handleSignOut}
+							onClick={() => handleSignOut()}
 							tooltip="Sign out"
 							className="text-destructive hover:text-destructive"
 						>

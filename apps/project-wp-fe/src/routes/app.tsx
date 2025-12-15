@@ -11,6 +11,7 @@ export const Route = createFileRoute("/app")({
 	beforeLoad: async () => {
 		// Server-side auth and status check using server function
 		const status = await getUserStatus();
+		console.log(`status: ${JSON.stringify(status)}`);
 
 		if (!status.session) {
 			throw redirect({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/app")({
 			hasOrganization: status.hasOrganization,
 			hasConnectedWABA: status.hasConnectedWABA,
 			activeOrganization: status.activeOrganization,
+			wsSecretKey: status.wsSecretKey,
 		};
 	},
 	component: AppLayout,

@@ -1,3 +1,7 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
+  - packages/wp-db
+  - apps/project-wp-fe
+  - apps/websocket
+
+onlyBuiltDependencies:
+  - esbuild
