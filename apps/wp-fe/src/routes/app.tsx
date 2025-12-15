@@ -6,6 +6,8 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { getUserStatus } from "@/server/auth";
+import { useEffect } from "react";
+import { websocket } from "@/lib/websocket";
 
 export const Route = createFileRoute("/app")({
 	beforeLoad: async () => {
@@ -31,6 +33,14 @@ export const Route = createFileRoute("/app")({
 
 function AppLayout() {
 	const { activeOrganization } = Route.useRouteContext();
+	const { wsSecretKey } = Route.useRouteContext();
+
+	// useEffect(() => {
+	// 	console.log("[App] Route entered");
+	// 	if (wsSecretKey) {
+	// 		websocket.connect(wsSecretKey);
+	// 	}
+	// }, [wsSecretKey]);
 
 	return (
 		<SidebarProvider>

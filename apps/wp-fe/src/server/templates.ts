@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/complexity/noBannedTypes: we use this to ignore the type errors */
 import { createServerFn } from "@tanstack/react-start";
-import { messageTemplates, whatsappBusinessAccounts } from "@wp/db";
+import { type JsonValue, messageTemplates, whatsappBusinessAccounts } from "@wp/db";
 import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { GRAPH_API_BASE, getSystemAccessToken } from "@/lib/facebook-api";
@@ -277,10 +277,8 @@ export const syncTemplates = createServerFn({ method: "POST" })
 								| "marketing"
 								| "authentication",
 							status: mapMetaStatusToDbStatus(template.status),
-							components: template.components as unknown as Record<
-								string,
-								unknown
-							>,
+							components:
+								template.components as unknown as Record<string, JsonValue>,
 						})
 						.onConflictDoUpdate({
 							target: [messageTemplates.templateId, messageTemplates.wabaId],
@@ -292,10 +290,8 @@ export const syncTemplates = createServerFn({ method: "POST" })
 									| "marketing"
 									| "authentication",
 								status: mapMetaStatusToDbStatus(template.status),
-								components: template.components as unknown as Record<
-									string,
-									unknown
-								>,
+								components:
+									template.components as unknown as Record<string, JsonValue>,
 								updatedAt: new Date(),
 							},
 						});
@@ -426,17 +422,13 @@ export const createTemplate = createServerFn({ method: "POST" })
 				language: data.language,
 				category: data.category,
 				status: mapMetaStatusToDbStatus(metaResponse.status),
-				components: data.components as unknown as Record<string, unknown>,
+				components: data.components as unknown as Record<string, JsonValue>,
 			})
 			.returning();
 
 		return {
 			success: true,
 			message: "Template created successfully and submitted for approval",
-			template: {
-				...newTemplate,
-				components: newTemplate.components as Record<string, {}> | null,
-				metadata: newTemplate.metadata as Record<string, {}> | null,
-			},
+			template: newTemplate,
 		};
 	});

@@ -6,3 +6,6 @@ onlyBuiltDependencies:
   - esbuild
 
 linkWorkspacePackages: true
+
+catalog:
+  - "drizzle-orm": "^0.45.1"

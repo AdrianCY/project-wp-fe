@@ -1,6 +1,7 @@
 import {
 	contacts,
 	conversations,
+	type JsonValue,
 	messages,
 	phoneNumbers,
 	whatsappBusinessAccounts,
@@ -173,29 +174,32 @@ export async function handleStatusUpdates(statuses: WebhookStatus[]) {
 /**
  * Build message content object based on message type
  */
-function buildMessageContent(message: WebhookMessage): Record<string, unknown> {
+function buildMessageContent(message: WebhookMessage): Record<string, JsonValue> {
 	switch (message.type) {
 		case "text":
-			return { body: message.text?.body };
+			return { body: message.text?.body ?? null };
 		case "image":
-			return { ...message.image };
+			return { ...message.image } as Record<string, JsonValue>;
 		case "video":
-			return { ...message.video };
+			return { ...message.video } as Record<string, JsonValue>;
 		case "audio":
-			return { ...message.audio };
+			return { ...message.audio } as Record<string, JsonValue>;
 		case "document":
-			return { ...message.document };
+			return { ...message.document } as Record<string, JsonValue>;
 		case "location":
-			return { ...message.location };
+			return { ...message.location } as Record<string, JsonValue>;
 		case "contacts":
-			return { contacts: message.contacts };
+			return { contacts: message.contacts } as unknown as Record<
+				string,
+				JsonValue
+			>;
 		case "interactive":
-			return { ...message.interactive };
+			return { ...message.interactive } as Record<string, JsonValue>;
 		case "reaction":
-			return { ...message.reaction };
+			return { ...message.reaction } as Record<string, JsonValue>;
 		case "button":
-			return { ...message.button };
+			return { ...message.button } as Record<string, JsonValue>;
 		default:
-			return { raw: message };
+			return { raw: message } as unknown as Record<string, JsonValue>;
 	}
 }

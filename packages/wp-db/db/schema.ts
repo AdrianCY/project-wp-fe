@@ -13,6 +13,15 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 
+// JSON-compatible type for jsonb columns
+export type JsonValue =
+	| string
+	| number
+	| boolean
+	| null
+	| JsonValue[]
+	| { [key: string]: JsonValue };
+
 // Re-export Better Auth schema
 export * from "./auth-schema";
 
@@ -115,7 +124,7 @@ export const whatsappBusinessAccounts = pgTable(
 		wabaId: varchar("waba_id", { length: 255 }).notNull().unique(),
 		name: varchar("name", { length: 255 }).notNull(),
 		status: wabaStatusEnum("status").default("pending").notNull(),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		deletedAt: timestamp("deleted_at"),
@@ -143,7 +152,7 @@ export const phoneNumbers = pgTable(
 		qualityRating: qualityRatingEnum("quality_rating").default("unknown"),
 		status: phoneNumberStatusEnum("status").default("pending").notNull(),
 		phoneNumberId: varchar("phone_number_id", { length: 255 }).unique(),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	},
@@ -166,7 +175,7 @@ export const contacts = pgTable(
 		waId: varchar("wa_id", { length: 50 }),
 		name: varchar("name", { length: 255 }),
 		email: varchar("email", { length: 255 }),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		deletedAt: timestamp("deleted_at"),
@@ -250,7 +259,7 @@ export const conversations = pgTable(
 		windowExpiresAt: timestamp("window_expires_at"),
 		isOpen: boolean("is_open").default(true).notNull(),
 		assignedToUserId: text("assigned_to_user_id"),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	},
@@ -277,7 +286,7 @@ export const messages = pgTable(
 		wamid: varchar("wamid", { length: 255 }).unique(),
 		direction: messageDirectionEnum("direction").notNull(),
 		type: messageTypeEnum("type").notNull(),
-		content: jsonb("content"),
+		content: jsonb("content").$type<Record<string, JsonValue>>(),
 		status: messageStatusEnum("status").default("pending").notNull(),
 		sentAt: timestamp("sent_at"),
 		deliveredAt: timestamp("delivered_at"),
@@ -285,7 +294,7 @@ export const messages = pgTable(
 		failedAt: timestamp("failed_at"),
 		errorCode: varchar("error_code", { length: 50 }),
 		errorMessage: text("error_message"),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	},
@@ -315,8 +324,8 @@ export const messageTemplates = pgTable(
 		language: varchar("language", { length: 10 }).notNull(),
 		category: templateCategoryEnum("category").notNull(),
 		status: templateStatusEnum("status").default("pending").notNull(),
-		components: jsonb("components"),
-		metadata: jsonb("metadata"),
+		components: jsonb("components").$type<Record<string, JsonValue>>(),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		deletedAt: timestamp("deleted_at"),
@@ -361,7 +370,7 @@ export const campaigns = pgTable(
 		deliveredCount: integer("delivered_count").default(0),
 		readCount: integer("read_count").default(0),
 		failedCount: integer("failed_count").default(0),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		deletedAt: timestamp("deleted_at"),
@@ -421,8 +430,8 @@ export const flows = pgTable(
 		flowId: varchar("flow_id", { length: 255 }).unique(),
 		name: varchar("name", { length: 255 }).notNull(),
 		status: flowStatusEnum("status").default("draft").notNull(),
-		flowJson: jsonb("flow_json"),
-		metadata: jsonb("metadata"),
+		flowJson: jsonb("flow_json").$type<Record<string, JsonValue>>(),
+		metadata: jsonb("metadata").$type<Record<string, JsonValue>>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		deletedAt: timestamp("deleted_at"),
@@ -451,7 +460,7 @@ export const flowResponses = pgTable(
 		conversationId: uuid("conversation_id").references(() => conversations.id, {
 			onDelete: "set null",
 		}),
-		responseData: jsonb("response_data"),
+		responseData: jsonb("response_data").$type<Record<string, JsonValue>>(),
 		completedAt: timestamp("completed_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},

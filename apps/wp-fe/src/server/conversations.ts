@@ -26,7 +26,7 @@ export type ConversationWithContact = Conversation & {
 		email: string | null;
 	};
 	lastMessage: {
-		content: unknown;
+		content: Message["content"];
 		type: string;
 		direction: string;
 		createdAt: Date;
