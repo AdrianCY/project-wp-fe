@@ -8,4 +8,4 @@ onlyBuiltDependencies:
 linkWorkspacePackages: true
 
 catalog:
-  - "drizzle-orm": "^0.45.1"
+  drizzle-orm: "^0.45.1"

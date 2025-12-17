@@ -1,5 +1,5 @@
 {
-  "name": "project-wp-fe",
+  "name": "@wp/fe",
   "private": true,
   "type": "module",
   "scripts": {
